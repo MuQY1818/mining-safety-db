@@ -9,8 +9,9 @@ import { antdTheme, cssVariables } from './config/theme';
 
 // 页面组件
 import LoginPage from './pages/Login';
-import DashboardPage from './pages/Dashboard';
+import DashboardPage from './pages/Dashboard/Dashboard';
 import NewAIChatPage from './pages/AIChat/NewAIChat';
+import DataManagementPage from './pages/DataManagement/DataManagementPage';
 import MainLayout from './components/Layout/MainLayout';
 
 // 状态管理
@@ -70,6 +71,12 @@ const App: React.FC = () => {
               <Route path="/" element={
                 <ProtectedRoute>
                   <DashboardPage />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/data-management" element={
+                <ProtectedRoute>
+                  <DataManagementPage />
                 </ProtectedRoute>
               } />
 

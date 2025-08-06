@@ -203,7 +203,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ sessionId, relatedItem })
           flex: 1,
           padding: '16px',
           overflowY: 'auto',
-          background: MINING_BLUE_COLORS.background.primary,
+          background: '#ffffff',
         }}
       >
         {/* 欢迎消息 */}
