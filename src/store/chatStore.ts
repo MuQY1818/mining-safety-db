@@ -124,34 +124,69 @@ export const useChatStore = create<ChatState>((set, get) => ({
       const allMessages = [...currentSession.messages, userMessage];
       
       // 使用流式响应
-      const stream = aiApi.chatStream(allMessages, currentSession.id);
-      
-      for await (const chunk of stream) {
-        set(state => ({
-          sessions: state.sessions.map(session =>
-            session.id === currentSession.id
+      await aiApi.chatStream(
+        content, // 用户消息内容
+        currentSession.id,
+        // onChunk - 处理流式数据
+        (chunk: string) => {
+          set(state => ({
+            sessions: state.sessions.map(session =>
+              session.id === currentSession.id
+                ? {
+                    ...session,
+                    messages: session.messages.map(msg =>
+                      msg.id === aiMessage.id
+                        ? { ...msg, content: msg.content + chunk }
+                        : msg
+                    )
+                  }
+                : session
+            ),
+            currentSession: state.currentSession
               ? {
-                  ...session,
-                  messages: session.messages.map(msg =>
+                  ...state.currentSession,
+                  messages: state.currentSession.messages.map(msg =>
                     msg.id === aiMessage.id
                       ? { ...msg, content: msg.content + chunk }
                       : msg
                   )
                 }
-              : session
-          ),
-          currentSession: state.currentSession
-            ? {
-                ...state.currentSession,
-                messages: state.currentSession.messages.map(msg =>
-                  msg.id === aiMessage.id
-                    ? { ...msg, content: msg.content + chunk }
-                    : msg
-                )
-              }
-            : null
-        }));
-      }
+              : null
+          }));
+        },
+        // onComplete - 完成回调
+        () => {
+          console.log('AI响应完成');
+        },
+        // onError - 错误处理
+        (error: string) => {
+          console.error('AI响应错误:', error);
+          set(state => ({
+            sessions: state.sessions.map(session =>
+              session.id === currentSession.id
+                ? {
+                    ...session,
+                    messages: session.messages.map(msg =>
+                      msg.id === aiMessage.id
+                        ? { ...msg, content: '抱歉，AI服务暂时不可用，请稍后再试。' }
+                        : msg
+                    )
+                  }
+                : session
+            ),
+            currentSession: state.currentSession
+              ? {
+                  ...state.currentSession,
+                  messages: state.currentSession.messages.map(msg =>
+                    msg.id === aiMessage.id
+                      ? { ...msg, content: '抱歉，AI服务暂时不可用，请稍后再试。' }
+                      : msg
+                  )
+                }
+              : null
+          }));
+        }
+      );
 
       // 保存会话到后端
       const updatedSession = get().currentSession;

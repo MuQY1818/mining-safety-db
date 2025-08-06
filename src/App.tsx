@@ -10,6 +10,7 @@ import { antdTheme, cssVariables } from './config/theme';
 // 页面组件
 import LoginPage from './pages/Login';
 import DashboardPage from './pages/Dashboard';
+import NewAIChatPage from './pages/AIChat/NewAIChat';
 import MainLayout from './components/Layout/MainLayout';
 
 // 状态管理
@@ -86,7 +87,7 @@ const App: React.FC = () => {
 
               <Route path="/ai-chat" element={
                 <ProtectedRoute>
-                  <div>AI问答页面 - 开发中</div>
+                  <NewAIChatPage />
                 </ProtectedRoute>
               } />
 

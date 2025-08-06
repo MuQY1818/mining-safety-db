@@ -14,6 +14,7 @@ import {
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
+import { useAIStatus } from '../../hooks/useAIStatus';
 import { MINING_BLUE_COLORS } from '../../config/theme';
 
 const { Header, Sider, Content } = Layout;
@@ -28,6 +29,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
+  const { isOnline: aiOnline, isChecking: aiChecking } = useAIStatus();
 
   // 菜单项配置
   const menuItems = [
@@ -84,15 +86,19 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
+    <Layout style={{
+      minHeight: '100vh',
+      background: `linear-gradient(135deg, ${MINING_BLUE_COLORS.background.primary} 0%, #e8f4fd 100%)`
+    }}>
       {/* 侧边栏 */}
-      <Sider 
-        trigger={null} 
-        collapsible 
+      <Sider
+        trigger={null}
+        collapsible
         collapsed={collapsed}
         style={{
-          background: MINING_BLUE_COLORS.background.card,
-          borderRight: `1px solid ${MINING_BLUE_COLORS.border.light}`,
+          background: `linear-gradient(180deg, ${MINING_BLUE_COLORS.primary} 0%, ${MINING_BLUE_COLORS.secondary} 100%)`,
+          borderRight: `1px solid ${MINING_BLUE_COLORS.border.medium}`,
+          boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
         }}
       >
         {/* Logo区域 */}
@@ -102,28 +108,30 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           alignItems: 'center',
           justifyContent: collapsed ? 'center' : 'flex-start',
           padding: collapsed ? 0 : '0 16px',
-          borderBottom: `1px solid ${MINING_BLUE_COLORS.border.light}`,
+          borderBottom: `1px solid rgba(255,255,255,0.2)`,
+          background: 'rgba(255,255,255,0.1)',
         }}>
           {!collapsed ? (
             <Space>
               <div style={{
                 width: 32,
                 height: 32,
-                background: MINING_BLUE_COLORS.primary,
+                background: 'rgba(255,255,255,0.9)',
                 borderRadius: 8,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                color: 'white',
+                color: MINING_BLUE_COLORS.primary,
                 fontWeight: 'bold',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
               }}>
                 矿
               </div>
               <div>
-                <Title level={5} style={{ margin: 0, color: MINING_BLUE_COLORS.primary }}>
+                <Title level={5} style={{ margin: 0, color: 'white' }}>
                   矿大安全数据库
                 </Title>
-                <Text type="secondary" style={{ fontSize: 12 }}>
+                <Text style={{ fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>
                   语言景观视域研究
                 </Text>
               </div>
@@ -132,13 +140,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <div style={{
               width: 32,
               height: 32,
-              background: MINING_BLUE_COLORS.primary,
+              background: 'rgba(255,255,255,0.9)',
               borderRadius: 8,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'white',
+              color: MINING_BLUE_COLORS.primary,
               fontWeight: 'bold',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
             }}>
               矿
             </div>
@@ -154,7 +163,9 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           style={{
             border: 'none',
             background: 'transparent',
+            marginTop: '16px',
           }}
+          theme="dark"
         />
       </Sider>
 
@@ -189,7 +200,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           {/* 右侧：用户信息 */}
           <Space>
             {/* AI状态指示 */}
-            <Badge status="success" text="AI在线" />
+            <Badge
+              status={aiOnline ? "success" : "error"}
+              text={aiChecking ? "检查中..." : (aiOnline ? "AI在线" : "AI离线")}
+            />
             
             {/* 用户头像和菜单 */}
             <Dropdown
@@ -217,8 +231,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
           margin: '16px',
           padding: '24px',
           background: MINING_BLUE_COLORS.background.card,
-          borderRadius: 8,
+          borderRadius: 12,
           minHeight: 'calc(100vh - 112px)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+          border: `1px solid ${MINING_BLUE_COLORS.border.light}`,
         }}>
           {children}
         </Content>

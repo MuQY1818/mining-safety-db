@@ -12,23 +12,31 @@ import {
 
 // AI问答API
 export const aiApi = {
-  // 流式聊天
-  chatStream: async function* (messages: ChatMessage[], sessionId: string): AsyncGenerator<string, void, unknown> {
+  // 流式聊天 - 使用回调方式
+  chatStream: async (
+    message: string,
+    sessionId: string,
+    onChunk: (chunk: string) => void,
+    onComplete: () => void,
+    onError: (error: string) => void
+  ): Promise<void> => {
     try {
       // 使用硅基流动服务进行流式对话
-      const stream = siliconFlowService.chatStream(messages);
-      
-      for await (const chunk of stream) {
-        yield chunk;
-      }
+      await siliconFlowService.chatStream(
+        message,
+        [], // 历史消息，暂时为空
+        onChunk,
+        onComplete,
+        onError
+      );
     } catch (error) {
       console.error('AI流式对话失败:', error);
-      throw error;
+      onError(error instanceof Error ? error.message : '聊天服务异常');
     }
   },
 
   // 非流式聊天
-  chat: async (messages: ChatMessage[], sessionId: string): Promise<string> => {
+  chat: async (messages: ChatMessage[], sessionId?: string): Promise<string> => {
     try {
       return await siliconFlowService.chat(messages);
     } catch (error) {
