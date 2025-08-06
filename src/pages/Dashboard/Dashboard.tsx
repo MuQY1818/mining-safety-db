@@ -272,8 +272,8 @@ const Dashboard: React.FC = () => {
   ];
 
   return (
-    <Layout style={{ minHeight: '100vh', background: '#f5f5f5' }}>
-      <Content style={{ padding: '24px' }}>
+    <Layout style={{ minHeight: '100vh', background: '#ffffff' }}>
+      <Content style={{ padding: '24px', background: '#ffffff' }}>
         {/* 页面标题 */}
         <div style={{ marginBottom: 24, textAlign: 'center' }}>
           <Title level={2} style={{ color: MINING_BLUE_COLORS.primary, margin: 0 }}>
