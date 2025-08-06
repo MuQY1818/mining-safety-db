@@ -302,24 +302,8 @@ interface LocationInfo {
   };
 }
 
-// 简化的安全数据类型（用于数据管理功能）
-export interface SafetyData {
-  id: string;
-  title: string;
-  description: string;
-  safetyLevel: 'low' | 'medium' | 'high' | 'critical';
-  mineType: 'coal' | 'metal' | 'nonmetal' | 'openpit';
-  category: 'gas_detection' | 'equipment_safety' | 'emergency_response' | 'safety_training' | 'accident_prevention' | 'environmental_protection';
-  publishDate: string;
-  viewCount: number;
-  location: LocationInfo;
-  downloadUrl?: string;
-  fileSize?: number;
-  fileType?: string;
-  tags?: string[];
-  createdAt?: string;
-  updatedAt?: string;
-}
+// 导入安全数据类型
+import { SafetyData } from '../types/safety';
 
 // 模拟安全数据（用于数据管理功能）
 export const mockSafetyData: SafetyData[] = [
@@ -437,5 +421,166 @@ export const mockSafetyData: SafetyData[] = [
     tags: ['事故预防', '风险评估', '安全管理'],
     createdAt: '2023-12-15T00:00:00Z',
     updatedAt: '2023-12-15T00:00:00Z'
+  },
+  {
+    id: 'sd_006',
+    title: '矿区环境保护技术指南',
+    description: '详细介绍矿区环境保护的技术措施、监测方法和治理方案，确保绿色开采。',
+    safetyLevel: 'medium',
+    mineType: 'coal',
+    category: 'environmental_protection',
+    publishDate: '2024-02-01T00:00:00Z',
+    viewCount: 756,
+    location: {
+      province: '山东省',
+      city: '济宁市',
+      district: '邹城市',
+      address: '兖矿集团',
+      coordinates: { latitude: 35.4058, longitude: 116.9734 }
+    },
+    downloadUrl: 'https://example.com/documents/environmental-protection-guide.pdf',
+    fileSize: 3670016,
+    fileType: 'pdf',
+    tags: ['环境保护', '绿色开采', '监测治理'],
+    createdAt: '2024-02-01T00:00:00Z',
+    updatedAt: '2024-02-01T00:00:00Z'
+  },
+  {
+    id: 'sd_007',
+    title: '井下通风系统设计规范',
+    description: '煤矿井下通风系统的设计原理、计算方法和安装要求，保障井下空气质量。',
+    safetyLevel: 'critical',
+    mineType: 'coal',
+    category: 'gas_detection',
+    publishDate: '2024-01-25T00:00:00Z',
+    viewCount: 1123,
+    location: {
+      province: '河南省',
+      city: '平顶山市',
+      district: '新华区',
+      address: '平煤神马集团',
+      coordinates: { latitude: 33.7453, longitude: 113.1929 }
+    },
+    downloadUrl: 'https://example.com/documents/ventilation-system-design.pdf',
+    fileSize: 2883584,
+    fileType: 'pdf',
+    tags: ['通风系统', '井下安全', '空气质量'],
+    createdAt: '2024-01-25T00:00:00Z',
+    updatedAt: '2024-01-25T00:00:00Z'
+  },
+  {
+    id: 'sd_008',
+    title: '金属矿山爆破安全技术',
+    description: '金属矿山爆破作业的安全技术要求、操作规程和防护措施。',
+    safetyLevel: 'critical',
+    mineType: 'metal',
+    category: 'equipment_safety',
+    publishDate: '2024-01-20T00:00:00Z',
+    viewCount: 987,
+    location: {
+      province: '云南省',
+      city: '昆明市',
+      district: '东川区',
+      address: '云南铜业集团',
+      coordinates: { latitude: 26.0832, longitude: 103.1865 }
+    },
+    downloadUrl: 'https://example.com/documents/metal-mine-blasting-safety.pdf',
+    fileSize: 2097152,
+    fileType: 'pdf',
+    tags: ['爆破安全', '金属矿山', '防护措施'],
+    createdAt: '2024-01-20T00:00:00Z',
+    updatedAt: '2024-01-20T00:00:00Z'
+  },
+  {
+    id: 'sd_009',
+    title: '露天矿边坡稳定性监测',
+    description: '露天矿边坡稳定性的监测技术、预警系统和处置方案。',
+    safetyLevel: 'high',
+    mineType: 'openpit',
+    category: 'accident_prevention',
+    publishDate: '2024-01-18T00:00:00Z',
+    viewCount: 634,
+    location: {
+      province: '辽宁省',
+      city: '抚顺市',
+      district: '新抚区',
+      address: '抚顺矿业集团',
+      coordinates: { latitude: 41.8654, longitude: 123.9057 }
+    },
+    downloadUrl: 'https://example.com/documents/slope-stability-monitoring.pdf',
+    fileSize: 3407872,
+    fileType: 'pdf',
+    tags: ['边坡稳定', '监测预警', '露天矿'],
+    createdAt: '2024-01-18T00:00:00Z',
+    updatedAt: '2024-01-18T00:00:00Z'
+  },
+  {
+    id: 'sd_010',
+    title: '矿工职业健康防护手册',
+    description: '矿工职业健康防护的基本知识、防护用品使用和健康检查要求。',
+    safetyLevel: 'medium',
+    mineType: 'nonmetal',
+    category: 'safety_training',
+    publishDate: '2024-01-12T00:00:00Z',
+    viewCount: 845,
+    location: {
+      province: '安徽省',
+      city: '淮北市',
+      district: '相山区',
+      address: '淮北矿业集团',
+      coordinates: { latitude: 33.9717, longitude: 116.7668 }
+    },
+    downloadUrl: 'https://example.com/documents/occupational-health-protection.pdf',
+    fileSize: 1835008,
+    fileType: 'pdf',
+    tags: ['职业健康', '防护用品', '健康检查'],
+    createdAt: '2024-01-12T00:00:00Z',
+    updatedAt: '2024-01-12T00:00:00Z'
+  },
+  {
+    id: 'sd_011',
+    title: '矿区火灾预防与扑救技术',
+    description: '矿区火灾的预防措施、早期发现技术和扑救方法，确保矿区消防安全。',
+    safetyLevel: 'critical',
+    mineType: 'coal',
+    category: 'emergency_response',
+    publishDate: '2024-02-05T00:00:00Z',
+    viewCount: 1289,
+    location: {
+      province: '黑龙江省',
+      city: '鸡西市',
+      district: '鸡冠区',
+      address: '龙煤集团',
+      coordinates: { latitude: 45.3000, longitude: 130.9811 }
+    },
+    downloadUrl: 'https://example.com/documents/fire-prevention-firefighting.pdf',
+    fileSize: 2621440,
+    fileType: 'pdf',
+    tags: ['火灾预防', '消防安全', '扑救技术'],
+    createdAt: '2024-02-05T00:00:00Z',
+    updatedAt: '2024-02-05T00:00:00Z'
+  },
+  {
+    id: 'sd_012',
+    title: '非金属矿山粉尘防治技术',
+    description: '非金属矿山粉尘的产生机理、防治技术和职业病预防措施。',
+    safetyLevel: 'high',
+    mineType: 'nonmetal',
+    category: 'environmental_protection',
+    publishDate: '2024-01-30T00:00:00Z',
+    viewCount: 567,
+    location: {
+      province: '广西壮族自治区',
+      city: '柳州市',
+      district: '柳北区',
+      address: '广西华锡集团',
+      coordinates: { latitude: 24.3264, longitude: 109.4281 }
+    },
+    downloadUrl: 'https://example.com/documents/dust-control-technology.pdf',
+    fileSize: 2359296,
+    fileType: 'pdf',
+    tags: ['粉尘防治', '职业病预防', '非金属矿'],
+    createdAt: '2024-01-30T00:00:00Z',
+    updatedAt: '2024-01-30T00:00:00Z'
   }
 ];

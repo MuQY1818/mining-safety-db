@@ -40,8 +40,8 @@ const generateId = (): string => {
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export const useSafetyDataStore = create<SafetyDataState>((set, get) => ({
-  data: [],
-  filteredData: [],
+  data: mockSafetyData,
+  filteredData: mockSafetyData,
   loading: false,
   error: null,
   searchTerm: '',

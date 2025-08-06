@@ -39,11 +39,6 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       label: '数据库',
     },
     {
-      key: '/add-data',
-      icon: <PlusOutlined />,
-      label: '添加数据',
-    },
-    {
       key: '/ai-chat',
       icon: <MessageOutlined />,
       label: 'AI问答',

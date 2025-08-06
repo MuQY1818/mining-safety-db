@@ -14,7 +14,7 @@ import NewAIChatPage from './pages/AIChat/NewAIChat';
 
 import FeedbackPage from './pages/Feedback/FeedbackPage';
 import DataDetailPage from './pages/DataDetail/DataDetailPage';
-import AddDataPage from './pages/AddData/AddDataPage';
+
 import MainLayout from './components/Layout/MainLayout';
 
 // 状态管理
@@ -97,11 +97,7 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               } />
 
-              <Route path="/add-data" element={
-                <ProtectedRoute>
-                  <AddDataPage />
-                </ProtectedRoute>
-              } />
+
 
               <Route path="/feedback" element={
                 <ProtectedRoute>
