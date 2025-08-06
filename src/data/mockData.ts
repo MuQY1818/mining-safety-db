@@ -1,14 +1,15 @@
 // Mock数据定义
-import { 
-  MiningLanguageItem, 
-  SafetyLevel, 
-  AccessLevel, 
-  SafetyCategory, 
-  MiningType, 
-  LanguageType, 
+import {
+  MiningLanguageItem,
+  SafetyLevel,
+  AccessLevel,
+  SafetyCategory,
+  MiningType,
+  LanguageType,
   FileType,
-  DatabaseStats 
+  DatabaseStats
 } from '../types/database';
+import { SafetyData } from '../types/safety';
 
 // Mock矿区安全数据
 export const mockMiningLanguageItems: MiningLanguageItem[] = [
@@ -302,8 +303,7 @@ interface LocationInfo {
   };
 }
 
-// 导入安全数据类型
-import { SafetyData } from '../types/safety';
+
 
 // 模拟安全数据（用于数据管理功能）
 export const mockSafetyData: SafetyData[] = [
