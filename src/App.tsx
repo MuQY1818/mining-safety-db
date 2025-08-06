@@ -11,9 +11,10 @@ import { antdTheme, cssVariables } from './config/theme';
 import LoginPage from './pages/Login';
 import DashboardPage from './pages/Dashboard/Dashboard';
 import NewAIChatPage from './pages/AIChat/NewAIChat';
-import DataManagementPage from './pages/DataManagement/DataManagementPage';
+
 import FeedbackPage from './pages/Feedback/FeedbackPage';
 import DataDetailPage from './pages/DataDetail/DataDetailPage';
+import AddDataPage from './pages/AddData/AddDataPage';
 import MainLayout from './components/Layout/MainLayout';
 
 // 状态管理
@@ -76,11 +77,7 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               } />
 
-              <Route path="/data-management" element={
-                <ProtectedRoute>
-                  <DataManagementPage />
-                </ProtectedRoute>
-              } />
+
 
               <Route path="/add-data" element={
                 <ProtectedRoute>
@@ -97,6 +94,12 @@ const App: React.FC = () => {
               <Route path="/ai-chat" element={
                 <ProtectedRoute>
                   <NewAIChatPage />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/add-data" element={
+                <ProtectedRoute>
+                  <AddDataPage />
                 </ProtectedRoute>
               } />
 
