@@ -1,5 +1,6 @@
 // 数据管理组件
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   Button,
@@ -55,16 +56,17 @@ const categoryConfig = {
 };
 
 const DataManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [formVisible, setFormVisible] = useState(false);
   const [editingData, setEditingData] = useState<SafetyData | null>(null);
   const [loading, setLoading] = useState(false);
-  
-  const { 
-    data, 
-    addData, 
-    updateData, 
-    deleteData, 
-    loading: storeLoading 
+
+  const {
+    data,
+    addData,
+    updateData,
+    deleteData,
+    loading: storeLoading
   } = useSafetyDataStore();
 
   // 处理添加数据
@@ -107,8 +109,7 @@ const DataManagement: React.FC = () => {
 
   // 处理查看详情
   const handleView = (record: SafetyData) => {
-    // 这里可以打开详情模态框或跳转到详情页
-    message.info('查看详情功能待实现');
+    navigate(`/data-detail/${record.id}`);
   };
 
   // 处理下载
@@ -126,15 +127,19 @@ const DataManagement: React.FC = () => {
       title: '标题',
       dataIndex: 'title',
       key: 'title',
-      width: 300,
+      width: 350,
       render: (text: string, record: SafetyData) => (
         <div>
-          <Text strong style={{ color: MINING_BLUE_COLORS.primary }}>
+          <Text strong style={{ color: MINING_BLUE_COLORS.primary, fontSize: 16 }}>
             {text}
           </Text>
           <br />
           <Text type="secondary" style={{ fontSize: '12px' }}>
             {record.description?.substring(0, 50)}...
+          </Text>
+          <br />
+          <Text type="secondary" style={{ fontSize: '11px', color: '#999' }}>
+            📍 {record.location.province} {record.location.city}
           </Text>
         </div>
       )
@@ -198,11 +203,13 @@ const DataManagement: React.FC = () => {
         <Space size="small">
           <Tooltip title="查看详情">
             <Button
-              type="text"
+              type="primary"
               size="small"
               icon={<EyeOutlined />}
               onClick={() => handleView(record)}
-            />
+            >
+              详情
+            </Button>
           </Tooltip>
           <Tooltip title="编辑">
             <Button

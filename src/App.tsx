@@ -13,6 +13,7 @@ import DashboardPage from './pages/Dashboard/Dashboard';
 import NewAIChatPage from './pages/AIChat/NewAIChat';
 import DataManagementPage from './pages/DataManagement/DataManagementPage';
 import FeedbackPage from './pages/Feedback/FeedbackPage';
+import DataDetailPage from './pages/DataDetail/DataDetailPage';
 import MainLayout from './components/Layout/MainLayout';
 
 // 状态管理
@@ -102,6 +103,12 @@ const App: React.FC = () => {
               <Route path="/feedback" element={
                 <ProtectedRoute>
                   <FeedbackPage />
+                </ProtectedRoute>
+              } />
+
+              <Route path="/data-detail/:id" element={
+                <ProtectedRoute>
+                  <DataDetailPage />
                 </ProtectedRoute>
               } />
 

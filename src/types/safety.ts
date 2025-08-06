@@ -15,6 +15,18 @@ export type SafetyCategory =
   | 'accident_prevention'
   | 'environmental_protection';
 
+// 地理位置信息
+export interface LocationInfo {
+  province: string;     // 省份
+  city: string;         // 城市
+  district?: string;    // 区县
+  address?: string;     // 详细地址
+  coordinates?: {       // 坐标信息
+    latitude: number;   // 纬度
+    longitude: number;  // 经度
+  };
+}
+
 // 安全数据接口
 export interface SafetyData {
   id: string;
@@ -25,6 +37,7 @@ export interface SafetyData {
   category: SafetyCategory;
   publishDate: string;
   viewCount: number;
+  location: LocationInfo;  // 地理位置信息
   downloadUrl?: string;
   fileSize?: number;
   fileType?: string;

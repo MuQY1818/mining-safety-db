@@ -290,6 +290,18 @@ export const accessLevelLabels: Record<AccessLevel, string> = {
   [AccessLevel.RESTRICTED]: '受限'
 };
 
+// 地理位置信息
+interface LocationInfo {
+  province: string;
+  city: string;
+  district?: string;
+  address?: string;
+  coordinates?: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
 // 简化的安全数据类型（用于数据管理功能）
 export interface SafetyData {
   id: string;
@@ -300,6 +312,7 @@ export interface SafetyData {
   category: 'gas_detection' | 'equipment_safety' | 'emergency_response' | 'safety_training' | 'accident_prevention' | 'environmental_protection';
   publishDate: string;
   viewCount: number;
+  location: LocationInfo;
   downloadUrl?: string;
   fileSize?: number;
   fileType?: string;
@@ -319,6 +332,13 @@ export const mockSafetyData: SafetyData[] = [
     category: 'gas_detection',
     publishDate: '2024-01-15T00:00:00Z',
     viewCount: 1250,
+    location: {
+      province: '山西省',
+      city: '太原市',
+      district: '万柏林区',
+      address: '山西焦煤集团西山煤电',
+      coordinates: { latitude: 37.8706, longitude: 112.5489 }
+    },
     downloadUrl: 'https://example.com/documents/gas-detection-standard.pdf',
     fileSize: 2048576,
     fileType: 'pdf',
@@ -335,6 +355,13 @@ export const mockSafetyData: SafetyData[] = [
     category: 'equipment_safety',
     publishDate: '2024-01-10T00:00:00Z',
     viewCount: 890,
+    location: {
+      province: '河北省',
+      city: '唐山市',
+      district: '迁安市',
+      address: '首钢矿业公司',
+      coordinates: { latitude: 39.9990, longitude: 118.7010 }
+    },
     downloadUrl: 'https://example.com/documents/equipment-safety-manual.pdf',
     fileSize: 3145728,
     fileType: 'pdf',
@@ -351,6 +378,13 @@ export const mockSafetyData: SafetyData[] = [
     category: 'emergency_response',
     publishDate: '2024-01-05T00:00:00Z',
     viewCount: 1456,
+    location: {
+      province: '陕西省',
+      city: '榆林市',
+      district: '神木市',
+      address: '神华神东煤炭集团',
+      coordinates: { latitude: 39.8266, longitude: 110.4989 }
+    },
     downloadUrl: 'https://example.com/documents/emergency-plan-guide.pdf',
     fileSize: 1572864,
     fileType: 'pdf',
@@ -367,6 +401,13 @@ export const mockSafetyData: SafetyData[] = [
     category: 'safety_training',
     publishDate: '2023-12-20T00:00:00Z',
     viewCount: 678,
+    location: {
+      province: '江苏省',
+      city: '徐州市',
+      district: '贾汪区',
+      address: '徐州矿务集团',
+      coordinates: { latitude: 34.4403, longitude: 117.4640 }
+    },
     downloadUrl: 'https://example.com/documents/safety-training-materials.pdf',
     fileSize: 4194304,
     fileType: 'pdf',
@@ -383,6 +424,13 @@ export const mockSafetyData: SafetyData[] = [
     category: 'accident_prevention',
     publishDate: '2023-12-15T00:00:00Z',
     viewCount: 923,
+    location: {
+      province: '内蒙古自治区',
+      city: '鄂尔多斯市',
+      district: '准格尔旗',
+      address: '中国神华准格尔能源公司',
+      coordinates: { latitude: 39.8664, longitude: 111.2406 }
+    },
     downloadUrl: 'https://example.com/documents/accident-prevention-methods.pdf',
     fileSize: 2621440,
     fileType: 'pdf',
