@@ -175,11 +175,33 @@ Response:
       "username": "zhangsan",
       "email": "zhangsan@example.com",
       "realName": "张三",
-      "role": "viewer"
+      "phone": "13800138000",
+      "role": "viewer",
+      "avatarUrl": null,
+      "isActive": true,
+      "createdAt": "2025-02-06T10:30:00Z",
+      "updatedAt": "2025-02-06T10:30:00Z"
     },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzAwMSIsInVzZXJuYW1lIjoiemhhbmdzYW4iLCJyb2xlIjoidmlld2VyIiwiaWF0IjoxNzM5MTY2NjAwLCJleHAiOjE3MzkyNTMwMDB9.abc123def456",
+    "expiresIn": 86400
   },
-  "message": "注册成功"
+  "message": "注册成功",
+  "timestamp": "2025-02-06T10:30:00Z",
+  "code": 201
+}
+
+错误响应示例:
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "用户名已存在",
+    "details": {
+      "field": "username",
+      "reason": "该用户名已被注册，请选择其他用户名"
+    }
+  },
+  "timestamp": "2025-02-06T10:30:00Z"
 }
 ```
 
@@ -202,13 +224,36 @@ Response:
       "username": "zhangsan",
       "email": "zhangsan@example.com",
       "realName": "张三",
+      "phone": "13800138000",
       "role": "viewer",
-      "avatarUrl": "https://example.com/avatar.jpg"
+      "avatarUrl": "https://example.com/avatar.jpg",
+      "isActive": true,
+      "lastLoginAt": "2025-02-06T10:30:00Z",
+      "createdAt": "2025-01-15T08:00:00Z",
+      "updatedAt": "2025-02-06T10:30:00Z"
     },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "expiresIn": 86400
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzAwMSIsInVzZXJuYW1lIjoiemhhbmdzYW4iLCJyb2xlIjoidmlld2VyIiwiaWF0IjoxNzM5MTY2NjAwLCJleHAiOjE3MzkyNTMwMDB9.abc123def456",
+    "expiresIn": 86400,
+    "refreshToken": "refresh_abc123def456"
   },
-  "message": "登录成功"
+  "message": "登录成功",
+  "timestamp": "2025-02-06T10:30:00Z",
+  "code": 200
+}
+
+错误响应示例:
+{
+  "success": false,
+  "error": {
+    "code": "INVALID_PASSWORD",
+    "message": "用户名或密码错误",
+    "details": {
+      "attempts": 3,
+      "maxAttempts": 5,
+      "lockoutTime": null
+    }
+  },
+  "timestamp": "2025-02-06T10:30:00Z"
 }
 ```
 
@@ -254,7 +299,7 @@ Response:
       {
         "id": "sd_001",
         "title": "煤矿瓦斯检测技术规范",
-        "description": "详细介绍煤矿瓦斯检测的技术要求...",
+        "description": "详细介绍煤矿瓦斯检测的技术要求、操作规程和安全标准，包括检测设备的使用方法和数据分析。适用于各类煤矿企业的瓦斯检测工作。",
         "safetyLevel": "critical",
         "mineType": "coal",
         "category": "gas_detection",
@@ -271,22 +316,71 @@ Response:
             "longitude": 112.5489
           }
         },
-        "downloadUrl": "https://example.com/documents/gas-detection-standard.pdf",
+        "downloadUrl": "https://oss.example.com/safety-docs/sd_001_gas_detection_standard.pdf",
         "fileSize": 2048576,
         "fileType": "pdf",
-        "tags": ["瓦斯", "检测", "安全规范"],
-        "createdAt": "2024-01-15T00:00:00Z",
-        "updatedAt": "2024-01-15T00:00:00Z"
+        "tags": ["瓦斯", "检测", "安全规范", "煤矿", "技术标准"],
+        "relatedItems": ["sd_007", "sd_011"],
+        "createdBy": "user_admin_001",
+        "createdAt": "2024-01-15T08:30:00Z",
+        "updatedAt": "2024-12-20T14:22:00Z"
+      },
+      {
+        "id": "sd_002",
+        "title": "矿山机械设备安全操作手册",
+        "description": "涵盖各类矿山机械设备的安全操作要点、维护保养和故障处理方法。",
+        "safetyLevel": "high",
+        "mineType": "metal",
+        "category": "equipment_safety",
+        "publishDate": "2024-01-10",
+        "viewCount": 890,
+        "downloadCount": 67,
+        "location": {
+          "province": "河北省",
+          "city": "唐山市",
+          "district": "迁安市",
+          "address": "首钢矿业公司",
+          "coordinates": {
+            "latitude": 39.9990,
+            "longitude": 118.7010
+          }
+        },
+        "downloadUrl": "https://oss.example.com/safety-docs/sd_002_equipment_safety_manual.pdf",
+        "fileSize": 3145728,
+        "fileType": "pdf",
+        "tags": ["机械设备", "安全操作", "维护", "金属矿"],
+        "relatedItems": ["sd_008"],
+        "createdBy": "user_editor_002",
+        "createdAt": "2024-01-10T09:15:00Z",
+        "updatedAt": "2024-01-10T09:15:00Z"
       }
     ],
     "pagination": {
       "page": 1,
       "pageSize": 20,
-      "total": 100,
-      "totalPages": 5
+      "total": 120,
+      "totalPages": 6,
+      "hasNext": true,
+      "hasPrev": false
+    },
+    "filters": {
+      "applied": {
+        "keyword": "瓦斯",
+        "safetyLevel": "critical",
+        "mineType": "coal",
+        "category": "gas_detection"
+      },
+      "available": {
+        "safetyLevels": ["low", "medium", "high", "critical"],
+        "mineTypes": ["coal", "metal", "nonmetal", "openpit"],
+        "categories": ["gas_detection", "equipment_safety", "emergency_response", "safety_training", "accident_prevention", "environmental_protection"],
+        "provinces": ["山西省", "河北省", "陕西省", "内蒙古自治区"]
+      }
     }
   },
-  "message": "查询成功"
+  "message": "查询成功",
+  "timestamp": "2025-02-06T10:30:00Z",
+  "code": 200
 }
 ```
 
@@ -358,9 +452,47 @@ Response:
   "data": {
     "id": "sd_013",
     "title": "新的安全资料",
-    "downloadUrl": "https://example.com/documents/new-safety-material.pdf"
+    "description": "资料描述",
+    "safetyLevel": "high",
+    "mineType": "coal",
+    "category": "safety_training",
+    "publishDate": "2025-02-06",
+    "viewCount": 0,
+    "downloadCount": 0,
+    "location": {
+      "province": "河南省",
+      "city": "郑州市",
+      "district": "中原区",
+      "address": null,
+      "coordinates": null
+    },
+    "downloadUrl": "https://oss.example.com/safety-docs/sd_013_new_safety_material.pdf",
+    "fileSize": 1572864,
+    "fileType": "pdf",
+    "tags": ["培训", "安全"],
+    "relatedItems": [],
+    "createdBy": "user_001",
+    "createdAt": "2025-02-06T10:30:00Z",
+    "updatedAt": "2025-02-06T10:30:00Z"
   },
-  "message": "创建成功"
+  "message": "创建成功",
+  "timestamp": "2025-02-06T10:30:00Z",
+  "code": 201
+}
+
+错误响应示例:
+{
+  "success": false,
+  "error": {
+    "code": "FILE_TOO_LARGE",
+    "message": "文件大小超出限制",
+    "details": {
+      "maxSize": 10485760,
+      "actualSize": 15728640,
+      "fileName": "large-document.pdf"
+    }
+  },
+  "timestamp": "2025-02-06T10:30:00Z"
 }
 ```
 
@@ -455,11 +587,56 @@ Response:
     },
     "recentActivity": {
       "newItemsThisWeek": 5,
+      "newItemsThisMonth": 18,
       "totalDownloadsThisMonth": 1250,
-      "mostViewedItems": ["sd_001", "sd_003", "sd_007"]
-    }
+      "totalViewsThisMonth": 8950,
+      "mostViewedItems": [
+        {
+          "id": "sd_001",
+          "title": "煤矿瓦斯检测技术规范",
+          "viewCount": 1250
+        },
+        {
+          "id": "sd_003",
+          "title": "矿区应急预案制定指南",
+          "viewCount": 1456
+        },
+        {
+          "id": "sd_007",
+          "title": "井下通风系统设计规范",
+          "viewCount": 1123
+        }
+      ],
+      "mostDownloadedItems": [
+        {
+          "id": "sd_001",
+          "title": "煤矿瓦斯检测技术规范",
+          "downloadCount": 89
+        },
+        {
+          "id": "sd_002",
+          "title": "矿山机械设备安全操作手册",
+          "downloadCount": 67
+        }
+      ]
+    },
+    "trends": {
+      "weeklyGrowth": {
+        "items": 4.2,
+        "views": 12.5,
+        "downloads": 8.3
+      },
+      "popularCategories": [
+        {"category": "gas_detection", "percentage": 20.8},
+        {"category": "equipment_safety", "percentage": 25.0},
+        {"category": "safety_training", "percentage": 20.8}
+      ]
+    },
+    "lastUpdated": "2025-02-06T10:30:00Z"
   },
-  "message": "查询成功"
+  "message": "查询成功",
+  "timestamp": "2025-02-06T10:30:00Z",
+  "code": 200
 }
 ```
 
@@ -585,11 +762,44 @@ Response:
   "success": true,
   "data": {
     "messageId": "msg_001",
-    "response": "根据《煤矿安全规程》规定，煤矿井下瓦斯浓度检测标准如下：\n\n1. 采掘工作面风流中瓦斯浓度不得超过1%\n2. 采掘工作面回风流中瓦斯浓度不得超过1%\n3. 采区回风巷、一翼回风巷、总回风巷的瓦斯浓度不得超过0.75%\n\n当瓦斯浓度达到1.5%时，必须停止作业，撤出人员，进行处理。",
-    "tokensUsed": 156,
-    "modelName": "qwen-plus"
+    "sessionId": "session_001",
+    "response": "根据《煤矿安全规程》规定，煤矿井下瓦斯浓度检测标准如下：\n\n## 瓦斯浓度限值\n\n1. **采掘工作面风流中**：瓦斯浓度不得超过 **1.0%**\n2. **采掘工作面回风流中**：瓦斯浓度不得超过 **1.0%**\n3. **采区回风巷、一翼回风巷、总回风巷**：瓦斯浓度不得超过 **0.75%**\n\n## 应急处理\n\n当瓦斯浓度达到 **1.5%** 时，必须：\n- 立即停止作业\n- 撤出所有人员\n- 进行通风处理\n- 查明原因并消除隐患\n\n## 相关资料\n\n您可以查看我们数据库中的相关资料：\n- [煤矿瓦斯检测技术规范](sd_001)\n- [井下通风系统设计规范](sd_007)",
+    "tokensUsed": 256,
+    "modelName": "qwen-plus",
+    "responseTime": 2.3,
+    "relatedDocuments": [
+      {
+        "id": "sd_001",
+        "title": "煤矿瓦斯检测技术规范",
+        "relevanceScore": 0.95
+      },
+      {
+        "id": "sd_007",
+        "title": "井下通风系统设计规范",
+        "relevanceScore": 0.87
+      }
+    ],
+    "confidence": 0.92,
+    "sources": ["《煤矿安全规程》", "国家安全生产监督管理总局"]
   },
-  "message": "回答成功"
+  "message": "回答成功",
+  "timestamp": "2025-02-06T10:30:15Z",
+  "code": 200
+}
+
+错误响应示例:
+{
+  "success": false,
+  "error": {
+    "code": "AI_SERVICE_ERROR",
+    "message": "AI服务暂时不可用",
+    "details": {
+      "serviceStatus": "degraded",
+      "retryAfter": 30,
+      "errorType": "rate_limit_exceeded"
+    }
+  },
+  "timestamp": "2025-02-06T10:30:00Z"
 }
 ```
 
@@ -683,12 +893,41 @@ Response:
       {
         "id": "sd_001",
         "title": "煤矿<em>瓦斯检测</em>技术规范",
-        "description": "详细介绍煤矿<em>瓦斯检测</em>的技术要求...",
+        "description": "详细介绍煤矿<em>瓦斯检测</em>的技术要求、操作规程和安全标准，包括检测设备的使用方法和数据分析。",
         "type": "safety_data",
         "score": 0.95,
+        "safetyLevel": "critical",
+        "mineType": "coal",
+        "category": "gas_detection",
+        "publishDate": "2024-01-15",
+        "viewCount": 1250,
+        "location": {
+          "province": "山西省",
+          "city": "太原市"
+        },
         "highlights": {
           "title": ["煤矿<em>瓦斯检测</em>技术规范"],
-          "description": ["详细介绍煤矿<em>瓦斯检测</em>的技术要求"]
+          "description": ["详细介绍煤矿<em>瓦斯检测</em>的技术要求", "包括检测设备的使用方法"],
+          "tags": ["<em>瓦斯</em>", "<em>检测</em>"]
+        }
+      },
+      {
+        "id": "sd_007",
+        "title": "井下通风系统设计规范",
+        "description": "煤矿井下通风系统的设计原理、计算方法和安装要求，保障井下空气质量。与<em>瓦斯检测</em>密切相关。",
+        "type": "safety_data",
+        "score": 0.78,
+        "safetyLevel": "critical",
+        "mineType": "coal",
+        "category": "gas_detection",
+        "publishDate": "2024-01-25",
+        "viewCount": 1123,
+        "location": {
+          "province": "河南省",
+          "city": "平顶山市"
+        },
+        "highlights": {
+          "description": ["与<em>瓦斯检测</em>密切相关"]
         }
       }
     ],
@@ -696,11 +935,31 @@ Response:
       "page": 1,
       "pageSize": 20,
       "total": 5,
-      "totalPages": 1
+      "totalPages": 1,
+      "hasNext": false,
+      "hasPrev": false
     },
-    "suggestions": ["瓦斯监测", "瓦斯治理", "瓦斯防治"]
+    "searchInfo": {
+      "query": "瓦斯检测",
+      "searchTime": 0.045,
+      "totalHits": 5,
+      "maxScore": 0.95
+    },
+    "suggestions": ["瓦斯监测", "瓦斯治理", "瓦斯防治", "瓦斯爆炸预防"],
+    "filters": {
+      "categories": [
+        {"key": "gas_detection", "count": 3, "label": "瓦斯检测"},
+        {"key": "safety_training", "count": 2, "label": "安全培训"}
+      ],
+      "safetyLevels": [
+        {"key": "critical", "count": 4, "label": "极高风险"},
+        {"key": "high", "count": 1, "label": "高风险"}
+      ]
+    }
   },
-  "message": "搜索成功"
+  "message": "搜索成功",
+  "timestamp": "2025-02-06T10:30:00Z",
+  "code": 200
 }
 ```
 
@@ -875,5 +1134,6 @@ CREATE DATABASE mining_safety_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_c
 ---
 
 **联系方式**：如有疑问，请联系前端开发团队
-**更新时间**：2024年2月6日
-**版本**：v1.0.0
+**更新时间**：2025年2月6日
+**版本**：v2.0.0
+
