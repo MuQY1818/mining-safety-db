@@ -1129,11 +1129,5 @@ CREATE DATABASE mining_safety_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_c
 ```
 
 ### 14.3 API文档
-建议使用Swagger/OpenAPI生成在线API文档，访问地址：`http://your-domain/api/docs`
-
----
-
-**联系方式**：如有疑问，请联系前端开发团队
-**更新时间**：2025年2月6日
-**版本**：v2.0.0
+建议使用Swagger/OpenAPI生成在线API文档，访问地址：`http://your-domain/api/doc 
 
