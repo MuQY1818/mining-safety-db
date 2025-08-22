@@ -1,24 +1,32 @@
 // AI聊天界面组件
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Card, 
-  Input, 
-  Button, 
-  Space, 
-  Typography, 
-  Avatar, 
-  List, 
+import {
+  Card,
+  Input,
+  Button,
+  Space,
+  Typography,
+  Avatar,
+  List,
   Spin,
   Tag,
   Tooltip,
-  message
+  message,
+  Row,
+  Col,
+  Drawer,
+  Empty,
+  Popconfirm
 } from 'antd';
-import { 
-  SendOutlined, 
-  RobotOutlined, 
+import {
+  SendOutlined,
+  RobotOutlined,
   UserOutlined,
   CopyOutlined,
-  ThunderboltOutlined
+  ThunderboltOutlined,
+  HistoryOutlined,
+  PlusOutlined,
+  DeleteOutlined
 } from '@ant-design/icons';
 import { ChatMessage } from '../../types/ai';
 import { useChatStore } from '../../store/chatStore';
@@ -30,19 +38,23 @@ const { Text, Paragraph } = Typography;
 interface ChatInterfaceProps {
   sessionId?: string;
   relatedItem?: any; // 相关的安全资料
+  showHistory?: boolean; // 是否显示历史对话
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ sessionId, relatedItem }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ sessionId, relatedItem, showHistory = true }) => {
   const [inputValue, setInputValue] = useState('');
+  const [showHistoryPanel, setShowHistoryPanel] = useState(true); // 默认显示历史面板
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { 
-    currentSession, 
-    isStreaming, 
-    error, 
-    sendMessage, 
-    createSession, 
+  const {
+    sessions,
+    currentSession,
+    isStreaming,
+    error,
+    sendMessage,
+    createSession,
     setCurrentSession,
-    clearError 
+    deleteSession,
+    clearError
   } = useChatStore();
 
   // 快捷问题
@@ -54,16 +66,18 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ sessionId, relatedItem })
   ];
 
   useEffect(() => {
-    // 如果没有当前会话，创建新会话
-    if (!currentSession) {
+    // 如果没有任何会话，创建新会话
+    if (sessions.length === 0) {
       const newSessionId = createSession(
         relatedItem ? `关于${relatedItem.title}的咨询` : '矿区安全咨询'
       );
-      if (sessionId && sessionId !== newSessionId) {
-        setCurrentSession(sessionId);
-      }
+      console.log('创建了新会话:', newSessionId);
     }
-  }, [currentSession, createSession, setCurrentSession, sessionId, relatedItem]);
+    // 如果有sessionId参数但不是当前会话，切换到指定会话
+    if (sessionId && sessionId !== currentSession?.id) {
+      setCurrentSession(sessionId);
+    }
+  }, [sessions.length, currentSession, createSession, setCurrentSession, sessionId, relatedItem]);
 
   useEffect(() => {
     // 自动滚动到底部
@@ -106,6 +120,47 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ sessionId, relatedItem })
     navigator.clipboard.writeText(text);
     message.success('已复制到剪贴板');
   };
+
+  // 切换历史面板显示
+  const toggleHistoryPanel = () => {
+    setShowHistoryPanel(!showHistoryPanel);
+  };
+
+  // 选择历史会话
+  const handleSelectSession = (session: any) => {
+    setCurrentSession(session.id);
+    setShowHistoryPanel(false); // 选择后关闭面板
+  };
+
+  // 创建新会话
+  const handleCreateNewSession = () => {
+    createSession('新的安全咨询');
+    message.success('新会话创建成功');
+  };
+
+  // 删除会话
+  const handleDeleteSession = async (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    try {
+      await deleteSession(sessionId);
+      message.success('会话删除成功');
+    } catch (error) {
+      message.error('删除会话失败');
+    }
+  };
+
+  // 格式化时间
+  const formatTime = (date: Date): string => {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) return '刚刚';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}分钟前`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}小时前`;
+    return date.toLocaleDateString('zh-CN');
+  };
+
+
 
   const renderMessage = (msg: ChatMessage) => {
     const isUser = msg.role === 'user';
@@ -179,16 +234,111 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ sessionId, relatedItem })
   };
 
   return (
-    <Card
-      title={
-        <Space>
-          <RobotOutlined style={{ color: MINING_BLUE_COLORS.primary }} />
-          <Text strong>矿区安全AI助手</Text>
-          <Tag color="green">在线</Tag>
-        </Space>
-      }
+    <div style={{ display: 'flex', height: '100%' }}>
+      {/* 历史对话面板 */}
+      {showHistory && showHistoryPanel && (
+        <Card
+          title={
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <Space>
+                <HistoryOutlined style={{ color: MINING_BLUE_COLORS.primary }} />
+                <Text strong>对话历史</Text>
+              </Space>
+              <Button
+                type="primary"
+                size="small"
+                icon={<PlusOutlined />}
+                onClick={handleCreateNewSession}
+              >
+                新建
+              </Button>
+            </div>
+          }
+          style={{ width: '300px', marginRight: '16px' }}
+          styles={{ body: { padding: 0, height: 'calc(100% - 57px)', overflow: 'auto' } }}
+        >
+          {sessions.length > 0 ? (
+            <List
+              dataSource={sessions}
+              renderItem={(session) => (
+                <List.Item
+                  key={session.id}
+                  style={{
+                    padding: '12px 16px',
+                    cursor: 'pointer',
+                    backgroundColor: session.id === currentSession?.id ? MINING_BLUE_COLORS.background.hover : 'transparent',
+                    borderLeft: session.id === currentSession?.id ? `3px solid ${MINING_BLUE_COLORS.primary}` : '3px solid transparent',
+                  }}
+                  onClick={() => handleSelectSession(session)}
+                  actions={[
+                    <Popconfirm
+                      key="delete"
+                      title="确定要删除这个会话吗？"
+                      onConfirm={(e) => handleDeleteSession(session.id, e!)}
+                      okText="确定"
+                      cancelText="取消"
+                    >
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<DeleteOutlined />}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </Popconfirm>
+                  ]}
+                >
+                  <List.Item.Meta
+                    title={<Text strong style={{ fontSize: 14 }}>{session.title}</Text>}
+                    description={
+                      <div style={{ fontSize: 12, color: MINING_BLUE_COLORS.text.secondary }}>
+                        {formatTime(session.updatedAt)} • {session.messages.length} 条消息
+                      </div>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+          ) : (
+            <Empty
+              image={Empty.PRESENTED_IMAGE_SIMPLE}
+              description="暂无对话记录"
+              style={{ padding: '40px 20px' }}
+            >
+              <Button type="primary" icon={<PlusOutlined />} onClick={handleCreateNewSession}>
+                创建第一个对话
+              </Button>
+            </Empty>
+          )}
+        </Card>
+      )}
+
+      {/* 主聊天界面 */}
+      <Card
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Space>
+              <RobotOutlined style={{ color: MINING_BLUE_COLORS.primary }} />
+              <Text strong>矿区安全AI助手</Text>
+              <Tag color="green">在线</Tag>
+            </Space>
+            {showHistory && (
+              <Button
+                type={showHistoryPanel ? "default" : "primary"}
+                icon={<HistoryOutlined />}
+                onClick={toggleHistoryPanel}
+                style={{
+                  color: showHistoryPanel ? MINING_BLUE_COLORS.text.secondary : 'white',
+                  backgroundColor: showHistoryPanel ? 'transparent' : MINING_BLUE_COLORS.primary,
+                  borderColor: MINING_BLUE_COLORS.primary
+                }}
+              >
+                {showHistoryPanel ? '隐藏历史' : '显示历史'}
+              </Button>
+            )}
+          </div>
+        }
       style={{ height: '600px', display: 'flex', flexDirection: 'column' }}
-      bodyStyle={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 0 }}
+      styles={{ body: { flex: 1, display: 'flex', flexDirection: 'column', padding: 0 } }}
     >
       {/* 错误提示 */}
       {error && (
@@ -271,7 +421,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ sessionId, relatedItem })
           <TextArea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyPress}
             placeholder="请输入您的矿区安全问题..."
             autoSize={{ minRows: 1, maxRows: 4 }}
             disabled={isStreaming}
@@ -296,6 +446,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ sessionId, relatedItem })
         </div>
       </div>
     </Card>
+    </div>
   );
 };
 

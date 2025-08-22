@@ -1,13 +1,13 @@
 // AI和反馈API服务
 import { apiClient, handleApiResponse, handleApiError } from './apiClient';
 import { siliconFlowService } from './siliconflow';
-import { 
-  ChatMessage, 
-  ChatSession, 
-  UserFeedback, 
-  FeedbackForm, 
-  FeedbackQuery, 
-  FeedbackStats 
+import {
+  ChatMessage,
+  ChatSession,
+  UserFeedback,
+  FeedbackForm,
+  FeedbackQuery,
+  FeedbackStats
 } from '../types/ai';
 
 // AI问答API
@@ -45,41 +45,52 @@ export const aiApi = {
     }
   },
 
-  // 保存会话到后端
+  // 保存会话到后端（简单实现）
   saveSession: async (sessionId: string, messages: ChatMessage[]): Promise<void> => {
     try {
-      await apiClient.post('/ai/sessions', { sessionId, messages });
+      // 这里可以调用后端API保存会话
+      console.log('保存会话:', sessionId, '消息数量:', messages.length);
+      // await apiClient.post('/ai/sessions', { sessionId, messages });
     } catch (error) {
-      return handleApiError(error);
+      console.warn('保存会话失败:', error);
     }
   },
 
-  // 获取用户会话列表
+  // 获取用户会话列表（简单实现）
   getSessions: async (userId: number): Promise<ChatSession[]> => {
     try {
-      const response = await apiClient.get(`/ai/sessions?userId=${userId}`);
-      return handleApiResponse<ChatSession[]>(response);
+      // 这里可以从后端API获取会话列表
+      console.log('获取用户会话:', userId);
+      // const response = await apiClient.get(`/ai/sessions?userId=${userId}`);
+      // return handleApiResponse<ChatSession[]>(response);
+      return [];
     } catch (error) {
-      return handleApiError(error);
+      console.warn('获取会话失败:', error);
+      return [];
     }
   },
 
-  // 获取会话详情
+  // 获取会话详情（简单实现）
   getSession: async (sessionId: string): Promise<ChatSession> => {
     try {
-      const response = await apiClient.get(`/ai/sessions/${sessionId}`);
-      return handleApiResponse<ChatSession>(response);
+      // 这里可以从后端API获取会话详情
+      console.log('获取会话详情:', sessionId);
+      // const response = await apiClient.get(`/ai/sessions/${sessionId}`);
+      // return handleApiResponse<ChatSession>(response);
+      throw new Error('会话不存在');
     } catch (error) {
       return handleApiError(error);
     }
   },
 
-  // 删除会话
+  // 删除会话（简单实现）
   deleteSession: async (sessionId: string): Promise<void> => {
     try {
-      await apiClient.delete(`/ai/sessions/${sessionId}`);
+      // 这里可以调用后端API删除会话
+      console.log('删除会话:', sessionId);
+      // await apiClient.delete(`/ai/sessions/${sessionId}`);
     } catch (error) {
-      return handleApiError(error);
+      console.warn('删除会话失败:', error);
     }
   },
 

@@ -38,12 +38,12 @@ interface FeedbackFormProps {
 
 // 建议类型选项
 const feedbackTypeOptions = [
-  { value: 'bug_report', label: '🐛 错误报告', description: '报告系统错误或异常' },
-  { value: 'feature_request', label: '✨ 功能建议', description: '建议新增功能或改进' },
-  { value: 'content_suggestion', label: '📝 内容建议', description: '建议添加或修改内容' },
-  { value: 'ui_improvement', label: '🎨 界面改进', description: '界面设计或交互改进' },
-  { value: 'performance', label: '⚡ 性能问题', description: '系统性能相关问题' },
-  { value: 'other', label: '💬 其他建议', description: '其他类型的建议' }
+  { value: 'bug_report', label: '🐛 错误报告', description: '系统错误或异常' },
+  { value: 'feature_request', label: '✨ 功能建议', description: '新功能或改进' },
+  { value: 'content_suggestion', label: '📝 内容建议', description: '添加或修改内容' },
+  { value: 'ui_improvement', label: '🎨 界面改进', description: '界面设计改进' },
+  { value: 'performance', label: '⚡ 性能优化', description: '性能相关问题' },
+  { value: 'other', label: '💬 其他', description: '其他建议' }
 ];
 
 // 优先级选项
@@ -166,12 +166,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, loading = false }
               <Select placeholder="选择建议类型">
                 {feedbackTypeOptions.map(option => (
                   <Option key={option.value} value={option.value}>
-                    <div>
-                      <div>{option.label}</div>
-                      <Text type="secondary" style={{ fontSize: 12 }}>
-                        {option.description}
-                      </Text>
-                    </div>
+                    {option.label}
                   </Option>
                 ))}
               </Select>

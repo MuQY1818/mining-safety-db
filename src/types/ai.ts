@@ -4,10 +4,29 @@
 export interface ChatMessage {
   id: string;
   sessionId: string;
-  role: 'user' | 'assistant';
+  role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: Date;
-  relatedItems?: number[];  // 相关资料ID列表
+  tokensUsed?: number;
+  modelName?: string;
+  responseTime?: number;
+  confidenceScore?: number;
+  relatedDocuments?: RelatedDocument[];
+  metadata?: MessageMetadata;
+}
+
+// 相关文档类型
+export interface RelatedDocument {
+  id: string;
+  title: string;
+  relevanceScore: number;
+}
+
+// 消息元数据类型
+export interface MessageMetadata {
+  sources?: string[];
+  searchKeywords?: string[];
+  [key: string]: any;
 }
 
 // 聊天会话类型
@@ -15,9 +34,31 @@ export interface ChatSession {
   id: string;
   userId: number;
   title: string;
+  description?: string;
+  status: 'active' | 'archived' | 'deleted';
+  messageCount: number;
+  totalTokens: number;
+  lastMessageAt?: Date;
   createdAt: Date;
   updatedAt: Date;
   messages: ChatMessage[];
+}
+
+// 会话更新参数类型
+export interface SessionUpdateParams {
+  title?: string;
+  description?: string;
+  status?: 'active' | 'archived' | 'deleted';
+}
+
+// 会话查询参数类型
+export interface SessionQueryParams {
+  page?: number;
+  pageSize?: number;
+  status?: 'active' | 'archived' | 'deleted';
+  sortBy?: 'createdAt' | 'updatedAt' | 'lastMessageAt' | 'messageCount';
+  sortOrder?: 'asc' | 'desc';
+  keyword?: string;
 }
 
 // AI API请求类型
@@ -39,6 +80,71 @@ export interface AIResponse {
 export interface StreamResponse {
   content: string;
   done: boolean;
+}
+
+// 消息反馈类型
+export interface MessageFeedback {
+  id: string;
+  messageId: string;
+  userId: number;
+  feedbackType: 'like' | 'dislike' | 'report';
+  feedbackReason?: string;
+  feedbackComment?: string;
+  createdAt: Date;
+}
+
+// 消息反馈提交类型
+export interface FeedbackSubmission {
+  feedbackType: 'like' | 'dislike' | 'report';
+  feedbackReason?: string;
+  feedbackComment?: string;
+}
+
+// AI对话统计类型
+export interface ChatStatistics {
+  overview: {
+    totalSessions: number;
+    totalMessages: number;
+    totalTokens: number;
+    averageMessagesPerSession: number;
+    averageTokensPerMessage: number;
+    activeUsers: number;
+  };
+  trends: {
+    dailyStats: DailyStats[];
+  };
+  feedback: {
+    totalFeedback: number;
+    likes: number;
+    dislikes: number;
+    reports: number;
+    likeRate: number;
+  };
+  popularTopics: TopicStats[];
+  modelUsage: Record<string, ModelUsageStats>;
+}
+
+// 每日统计类型
+export interface DailyStats {
+  date: string;
+  sessions: number;
+  messages: number;
+  tokens: number;
+  users: number;
+}
+
+// 话题统计类型
+export interface TopicStats {
+  topic: string;
+  count: number;
+  percentage: number;
+}
+
+// 模型使用统计类型
+export interface ModelUsageStats {
+  count: number;
+  percentage: number;
+  averageTokens: number;
 }
 
 // 用户建议反馈相关类型定义

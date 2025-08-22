@@ -22,14 +22,17 @@ export const MINING_BLUE_COLORS = {
     primary: '#1f2937',    // 主要文字
     secondary: '#6b7280',  // 次要文字
     light: '#9ca3af',      // 浅色文字
+    tertiary: '#d1d5db',   // 三级文字
     white: '#ffffff',      // 白色文字
   },
 
   background: {
     primary: '#f8fafc',    // 页面背景
+    page: '#f8fafc',       // 页面背景（别名）
     card: '#ffffff',       // 卡片背景
     hover: '#f1f5f9',      // 悬停背景
     active: '#e2e8f0',     // 激活背景
+    selected: '#eff6ff',   // 选中背景
   },
 
   border: {

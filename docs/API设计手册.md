@@ -87,20 +87,61 @@ CREATE TABLE feedback (
 );
 ```
 
-### 2.4 AI对话记录表 (ai_conversations)
+### 2.4 聊天会话表 (chat_sessions)
 ```sql
-CREATE TABLE ai_conversations (
+CREATE TABLE chat_sessions (
     id VARCHAR(36) PRIMARY KEY,
-    user_id VARCHAR(36),
-    session_id VARCHAR(36) NOT NULL,
-    message_type ENUM('user', 'assistant') NOT NULL,
-    content TEXT NOT NULL,
-    tokens_used INT,
-    model_name VARCHAR(50),
+    user_id VARCHAR(36) NOT NULL,
+    title VARCHAR(200) NOT NULL DEFAULT '新对话',
+    description TEXT,
+    status ENUM('active', 'archived', 'deleted') DEFAULT 'active',
+    message_count INT DEFAULT 0,
+    total_tokens INT DEFAULT 0,
+    last_message_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_session (session_id),
-    INDEX idx_user_session (user_id, session_id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status),
+    INDEX idx_last_message (last_message_at),
+    INDEX idx_user_status (user_id, status),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
+
+### 2.5 聊天消息表 (chat_messages)
+```sql
+CREATE TABLE chat_messages (
+    id VARCHAR(36) PRIMARY KEY,
+    session_id VARCHAR(36) NOT NULL,
+    role ENUM('user', 'assistant', 'system') NOT NULL,
+    content TEXT NOT NULL,
+    tokens_used INT DEFAULT 0,
+    model_name VARCHAR(50),
+    response_time DECIMAL(5,3),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_session_id (session_id),
+    INDEX idx_session_created (session_id, created_at),
+    INDEX idx_role (role),
+    FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
+);
+```
+
+### 2.6 聊天消息反馈表 (chat_message_feedback)
+```sql
+CREATE TABLE chat_message_feedback (
+    id VARCHAR(36) PRIMARY KEY,
+    message_id VARCHAR(36) NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
+    feedback_type ENUM('like', 'dislike', 'report') NOT NULL,
+    feedback_reason VARCHAR(100),
+    feedback_comment TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_message_id (message_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_feedback_type (feedback_type),
+    FOREIGN KEY (message_id) REFERENCES chat_messages(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY uk_user_message (user_id, message_id)
 );
 ```
 
@@ -743,69 +784,54 @@ Response:
 }
 ```
 
-## 8. AI问答接口
+## 8. AI聊天历史管理接口
 
-### 8.1 发送AI问答消息
+> **架构说明**:
+> - AI对话请求直接从前端发送到第三方AI服务（如硅基流动）
+> - 后端只负责存储和管理聊天历史记录
+> - 前端负责AI对话的实时交互和流式响应处理
+> - 后端提供会话管理、消息存储、历史查询等功能
+
+### 前端AI集成流程
+1. **创建会话**: 前端调用后端API创建新的聊天会话
+2. **发送消息**: 前端直接向AI服务发送用户消息
+3. **接收响应**: 前端处理AI服务的流式响应
+4. **保存记录**: 前端将用户消息和AI响应保存到后端
+5. **更新会话**: 后端更新会话的消息计数和最后活动时间
+
+### 8.1 创建AI对话会话
 ```
-POST /api/ai/chat
+POST /api/chat/sessions
 Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "message": "煤矿瓦斯检测的标准浓度是多少？",
-  "sessionId": "session_001",
-  "context": []
+  "title": "关于瓦斯检测的咨询",
+  "description": "询问煤矿瓦斯检测相关问题"
 }
 
 Response:
 {
   "success": true,
   "data": {
-    "messageId": "msg_001",
-    "sessionId": "session_001",
-    "response": "根据《煤矿安全规程》规定，煤矿井下瓦斯浓度检测标准如下：\n\n## 瓦斯浓度限值\n\n1. **采掘工作面风流中**：瓦斯浓度不得超过 **1.0%**\n2. **采掘工作面回风流中**：瓦斯浓度不得超过 **1.0%**\n3. **采区回风巷、一翼回风巷、总回风巷**：瓦斯浓度不得超过 **0.75%**\n\n## 应急处理\n\n当瓦斯浓度达到 **1.5%** 时，必须：\n- 立即停止作业\n- 撤出所有人员\n- 进行通风处理\n- 查明原因并消除隐患\n\n## 相关资料\n\n您可以查看我们数据库中的相关资料：\n- [煤矿瓦斯检测技术规范](sd_001)\n- [井下通风系统设计规范](sd_007)",
-    "tokensUsed": 256,
-    "modelName": "qwen-plus",
-    "responseTime": 2.3,
-    "relatedDocuments": [
-      {
-        "id": "sd_001",
-        "title": "煤矿瓦斯检测技术规范",
-        "relevanceScore": 0.95
-      },
-      {
-        "id": "sd_007",
-        "title": "井下通风系统设计规范",
-        "relevanceScore": 0.87
-      }
-    ],
-    "confidence": 0.92,
-    "sources": ["《煤矿安全规程》", "国家安全生产监督管理总局"]
+    "id": "session_001",
+    "title": "关于瓦斯检测的咨询",
+    "description": "询问煤矿瓦斯检测相关问题",
+    "status": "active",
+    "messageCount": 0,
+    "totalTokens": 0,
+    "createdAt": "2025-02-06T10:30:00Z",
+    "updatedAt": "2025-02-06T10:30:00Z"
   },
-  "message": "回答成功",
-  "timestamp": "2025-02-06T10:30:15Z",
-  "code": 200
-}
-
-错误响应示例:
-{
-  "success": false,
-  "error": {
-    "code": "AI_SERVICE_ERROR",
-    "message": "AI服务暂时不可用",
-    "details": {
-      "serviceStatus": "degraded",
-      "retryAfter": 30,
-      "errorType": "rate_limit_exceeded"
-    }
-  },
-  "timestamp": "2025-02-06T10:30:00Z"
+  "message": "会话创建成功",
+  "timestamp": "2025-02-06T10:30:00Z",
+  "code": 201
 }
 ```
 
-### 8.2 获取AI对话历史
+### 8.2 获取用户聊天会话列表
 ```
-GET /api/ai/conversations/{sessionId}?page=1&pageSize=50
+GET /api/chat/sessions?page=1&pageSize=20&status=active&sortBy=lastMessageAt&sortOrder=desc
 Authorization: Bearer <token>
 
 Response:
@@ -814,28 +840,316 @@ Response:
   "data": {
     "items": [
       {
-        "id": "msg_001",
-        "messageType": "user",
-        "content": "煤矿瓦斯检测的标准浓度是多少？",
-        "createdAt": "2024-02-06T10:30:00Z"
+        "id": "session_001",
+        "title": "关于瓦斯检测的咨询",
+        "description": "询问煤矿瓦斯检测相关问题",
+        "status": "active",
+        "messageCount": 15,
+        "totalTokens": 2048,
+        "lastMessageAt": "2025-02-06T15:45:00Z",
+        "createdAt": "2025-02-06T10:30:00Z",
+        "updatedAt": "2025-02-06T15:45:00Z",
+        "lastMessage": {
+          "role": "assistant",
+          "content": "根据《煤矿安全规程》规定，煤矿井下瓦斯浓度检测标准...",
+          "createdAt": "2025-02-06T15:45:00Z"
+        }
       },
       {
-        "id": "msg_002",
-        "messageType": "assistant",
+        "id": "session_002",
+        "title": "矿山机械安全操作",
+        "description": null,
+        "status": "active",
+        "messageCount": 8,
+        "totalTokens": 1024,
+        "lastMessageAt": "2025-02-05T14:20:00Z",
+        "createdAt": "2025-02-05T09:15:00Z",
+        "updatedAt": "2025-02-05T14:20:00Z",
+        "lastMessage": {
+          "role": "user",
+          "content": "矿山机械设备的日常维护要点有哪些？",
+          "createdAt": "2025-02-05T14:20:00Z"
+        }
+      }
+    ],
+    "pagination": {
+      "page": 1,
+      "pageSize": 20,
+      "total": 25,
+      "totalPages": 2,
+      "hasNext": true,
+      "hasPrev": false
+    }
+  },
+  "message": "查询成功",
+  "timestamp": "2025-02-06T10:30:00Z",
+  "code": 200
+}
+```
+
+### 8.3 获取聊天会话详情
+```
+GET /api/chat/sessions/{sessionId}
+Authorization: Bearer <token>
+
+Response:
+{
+  "success": true,
+  "data": {
+    "id": "session_001",
+    "title": "关于瓦斯检测的咨询",
+    "description": "询问煤矿瓦斯检测相关问题",
+    "status": "active",
+    "messageCount": 15,
+    "totalTokens": 2048,
+    "lastMessageAt": "2025-02-06T15:45:00Z",
+    "createdAt": "2025-02-06T10:30:00Z",
+    "updatedAt": "2025-02-06T15:45:00Z"
+  },
+  "message": "查询成功"
+}
+```
+
+### 8.4 更新聊天会话
+```
+PUT /api/chat/sessions/{sessionId}
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "title": "煤矿瓦斯检测技术咨询",
+  "description": "深入了解煤矿瓦斯检测的技术要求和操作规程"
+}
+
+Response:
+{
+  "success": true,
+  "data": {
+    "id": "session_001",
+    "title": "煤矿瓦斯检测技术咨询",
+    "description": "深入了解煤矿瓦斯检测的技术要求和操作规程",
+    "updatedAt": "2025-02-06T16:00:00Z"
+  },
+  "message": "会话更新成功"
+}
+```
+
+### 8.5 删除聊天会话
+```
+DELETE /api/chat/sessions/{sessionId}
+Authorization: Bearer <token>
+
+Response:
+{
+  "success": true,
+  "message": "会话删除成功"
+}
+```
+
+### 8.6 归档聊天会话
+```
+PUT /api/chat/sessions/{sessionId}/archive
+Authorization: Bearer <token>
+
+Response:
+{
+  "success": true,
+  "data": {
+    "id": "session_001",
+    "status": "archived",
+    "updatedAt": "2025-02-06T16:00:00Z"
+  },
+  "message": "会话归档成功"
+}
+```
+
+### 8.7 保存聊天消息
+```
+POST /api/chat/sessions/{sessionId}/messages
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "messages": [
+    {
+      "role": "user",
+      "content": "煤矿瓦斯检测的标准浓度是多少？",
+      "timestamp": "2025-02-06T10:30:00Z"
+    },
+    {
+      "role": "assistant",
+      "content": "根据《煤矿安全规程》规定，煤矿井下瓦斯浓度检测标准如下：\n\n## 瓦斯浓度限值\n\n1. **采掘工作面风流中**：瓦斯浓度不得超过 **1.0%**\n2. **采掘工作面回风流中**：瓦斯浓度不得超过 **1.0%**\n3. **采区回风巷、一翼回风巷、总回风巷**：瓦斯浓度不得超过 **0.75%**",
+      "timestamp": "2025-02-06T10:30:15Z",
+      "tokensUsed": 256,
+      "modelName": "qwen-plus",
+      "responseTime": 2.3
+    }
+  ]
+}
+
+Response:
+{
+  "success": true,
+  "data": {
+    "savedMessages": [
+      {
+        "id": "msg_user_001",
+        "sessionId": "session_001",
+        "role": "user",
+        "content": "煤矿瓦斯检测的标准浓度是多少？",
+        "createdAt": "2025-02-06T10:30:00Z"
+      },
+      {
+        "id": "msg_assistant_001",
+        "sessionId": "session_001",
+        "role": "assistant",
         "content": "根据《煤矿安全规程》规定...",
-        "tokensUsed": 156,
+        "tokensUsed": 256,
         "modelName": "qwen-plus",
-        "createdAt": "2024-02-06T10:30:15Z"
+        "responseTime": 2.3,
+        "createdAt": "2025-02-06T10:30:15Z"
+      }
+    ],
+    "sessionUpdated": {
+      "messageCount": 15,
+      "totalTokens": 2048,
+      "lastMessageAt": "2025-02-06T10:30:15Z"
+    }
+  },
+  "message": "消息保存成功",
+  "timestamp": "2025-02-06T10:30:15Z",
+  "code": 200
+}
+```
+
+### 8.8 获取聊天消息历史
+```
+GET /api/chat/sessions/{sessionId}/messages?page=1&pageSize=50&role=all&sortOrder=asc
+Authorization: Bearer <token>
+
+Response:
+{
+  "success": true,
+  "data": {
+    "items": [
+      {
+        "id": "msg_user_001",
+        "sessionId": "session_001",
+        "role": "user",
+        "content": "煤矿瓦斯检测的标准浓度是多少？",
+        "createdAt": "2025-02-06T10:30:00Z"
+      },
+      {
+        "id": "msg_assistant_001",
+        "sessionId": "session_001",
+        "role": "assistant",
+        "content": "根据《煤矿安全规程》规定，煤矿井下瓦斯浓度检测标准如下...",
+        "tokensUsed": 256,
+        "modelName": "qwen-plus",
+        "responseTime": 2.3,
+        "createdAt": "2025-02-06T10:30:15Z"
       }
     ],
     "pagination": {
       "page": 1,
       "pageSize": 50,
       "total": 2,
-      "totalPages": 1
+      "totalPages": 1,
+      "hasNext": false,
+      "hasPrev": false
+    },
+    "sessionInfo": {
+      "id": "session_001",
+      "title": "关于瓦斯检测的咨询",
+      "messageCount": 2,
+      "totalTokens": 256
     }
   },
   "message": "查询成功"
+}
+```
+
+### 8.9 删除聊天消息
+```
+DELETE /api/chat/messages/{messageId}
+Authorization: Bearer <token>
+
+Response:
+{
+  "success": true,
+  "message": "消息删除成功"
+}
+```
+
+### 8.10 对AI消息进行反馈
+```
+POST /api/chat/messages/{messageId}/feedback
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "feedbackType": "like",
+  "feedbackReason": "helpful",
+  "feedbackComment": "回答很详细，对我很有帮助"
+}
+
+Response:
+{
+  "success": true,
+  "data": {
+    "id": "feedback_001",
+    "messageId": "msg_assistant_001",
+    "feedbackType": "like",
+    "feedbackReason": "helpful",
+    "feedbackComment": "回答很详细，对我很有帮助",
+    "createdAt": "2025-02-06T10:35:00Z"
+  },
+  "message": "反馈提交成功"
+}
+```
+
+### 8.11 批量删除聊天消息
+```
+DELETE /api/chat/sessions/{sessionId}/messages
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "messageIds": ["msg_001", "msg_002", "msg_003"]
+}
+
+Response:
+{
+  "success": true,
+  "data": {
+    "deletedCount": 3,
+    "sessionUpdated": {
+      "messageCount": 12,
+      "totalTokens": 1800,
+      "lastMessageAt": "2025-02-06T15:30:00Z"
+    }
+  },
+  "message": "消息删除成功"
+}
+```
+
+### 8.12 清空聊天会话
+```
+DELETE /api/chat/sessions/{sessionId}/messages/all
+Authorization: Bearer <token>
+
+Response:
+{
+  "success": true,
+  "data": {
+    "deletedCount": 15,
+    "sessionUpdated": {
+      "messageCount": 0,
+      "totalTokens": 0,
+      "lastMessageAt": null
+    }
+  },
+  "message": "会话已清空"
 }
 ```
 
